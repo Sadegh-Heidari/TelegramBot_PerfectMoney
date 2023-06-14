@@ -75,63 +75,76 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
 
 
                 }
-                else if (update.CallbackQuery?.Data == "لیست بعد")
+                else if(update.Type == UpdateType.CallbackQuery)
                 {
-                    PageNumber += 1;
-                    var result = UserStepHandler.GetUserLastStep(update.CallbackQuery.Message.Chat.Id.ToString());
-                    await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
-                }
-                else if (update.CallbackQuery?.Data == "لیست قبل")
-                {
-                    PageNumber -= 1;
-                    if (PageNumber < 1)
-                        PageNumber = 1;
+                     if (update.CallbackQuery?.Data == "لیست بعد")
+                    {
+                        PageNumber += 1;
+                        var result = UserStepHandler.GetUserLastStep(update.CallbackQuery.Message.Chat.Id.ToString());
+                        await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
+                    }
+                    else if (update.CallbackQuery?.Data == "لیست قبل")
+                    {
+                        PageNumber -= 1;
+                        if (PageNumber < 1)
+                            PageNumber = 1;
 
-                    await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
-                }
-                #region About Admin Panel
-
-                else if (update.Message?.Text == "لیست کاربران 📄")
-                {
-                    await _operation.AdminUserListSection(botClient, update, cancellationToken);
-                }
-                else if (update.Message?.Text == "مدیریت " + "👨🏼‍💼")
-                {
-                    await _operation.AdminMainSection(botClient, update, cancellationToken);
-
-                }
-                else if (update.Message?.Text == "نمایش کاربران 🧑")
-                {
-                    if (PageNumber > 1 || PageNumber == 0)
-                        PageNumber = 1;
-                    await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
-                }
-                else if (update.Message?.Text == "جستجو 🔎")
-                {
-                    await _operation.SendNumberRequest(botClient, update, cancellationToken);
-                }
-                else if (update.Message.Text.Contains("شماره همراه"))
-                {
-                   await _operation.SearchUserByPhoneNumber(botClient, update, cancellationToken);
+                        await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
+                    }
                 }
                 
 
+               else if (update.Type == UpdateType.Message)
+                {
+                    #region About Admin Panel
 
-                #endregion
 
-                else if (update.Message?.Text == "بازگشت به مرحله قبل")
-                {
-                    await _operation.BackToPreviousnStep(botClient, update, cancellationToken);
+                    if (update.Message?.Text == "لیست کاربران 📄")
+                    {
+                        await _operation.AdminUserListSection(botClient, update, cancellationToken);
+                    }
+                    else if (update.Message?.Text == "مدیریت " + "👨🏼‍💼")
+                    {
+                        await _operation.AdminMainSection(botClient, update, cancellationToken);
+
+                    }
+                    else if (update.Message?.Text == "نمایش کاربران 🧑")
+                    {
+                        if (PageNumber > 1 || PageNumber == 0)
+                            PageNumber = 1;
+                        await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
+                    }
+                    else if (update.Message?.Text == "جستجو 🔎")
+                    {
+                        await _operation.SendNumberRequest(botClient, update, cancellationToken);
+                    }
+                    else if (update.Message.Text.Contains("شماره همراه"))
+                    {
+                        await _operation.SearchUserByPhoneNumber(botClient, update, cancellationToken);
+                    }
+                    #endregion
+
+
+                    else if (update.Message?.Text == "بازگشت به مرحله قبل")
+                     {
+                         await _operation.BackToPreviousnStep(botClient, update, cancellationToken);
+                     }
+                     else if (update.Message?.Text == "صفحه اصلی")
+                     {
+                         await _operation.BackToMainSection(botClient, update, cancellationToken);
+                     }
+                     else
+                     {
+                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                             cancellationToken: cancellationToken);
+                     }
                 }
-                else if (update.Message?.Text == "صفحه اصلی")
-                {
-                    await _operation.BackToMainSection(botClient, update, cancellationToken);
-                }
-                else
-                {
-                 await   botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
-                        cancellationToken: cancellationToken);
-                }
+               
+                
+
+
+
+              
             }
 
 
