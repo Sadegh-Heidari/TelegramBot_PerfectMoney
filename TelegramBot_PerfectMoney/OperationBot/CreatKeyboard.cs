@@ -12,6 +12,53 @@ namespace TelegramBot_PerfectMoney.OperationBot
         private static ReplyKeyboardMarkup? mainKeyboardMarkup { get; set; }
         private static ReplyKeyboardMarkup? AdminMainKeyboradMarkup { get; set; }
         private static ReplyKeyboardMarkup? ShareContactKeyboradMarkup { get; set; }
+        private static ReplyKeyboardMarkup? UserListKeyboardMarkup { get; set; }
+        private static InlineKeyboardMarkup? PaginitionListMarkup { get; set; }
+        private static ReplyKeyboardMarkup? BackKeyboardsMarkup { get; set; }
+
+        public static ReplyKeyboardMarkup BackKeyboards()
+        {
+            if (BackKeyboardsMarkup is null)
+            {
+                BackKeyboardsMarkup = new ReplyKeyboardMarkup(new[]
+                    {
+                        new KeyboardButton[] { "بازگشت به مرحله قبل" },
+                        new KeyboardButton[] { "صفحه اصلی" },
+                    })
+                    { ResizeKeyboard = true };
+            }
+            return BackKeyboardsMarkup;
+        }
+        public static InlineKeyboardMarkup PaginitionUserListKeyboard()
+        {
+            
+            if (PaginitionListMarkup is null)
+            {
+                PaginitionListMarkup = new InlineKeyboardMarkup(new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "لیست قبل", callbackData: "لیست قبل"),
+                    InlineKeyboardButton.WithCallbackData(text: "لیست بعد", callbackData: "لیست بعد"),
+                });
+            }
+
+            return PaginitionListMarkup;
+        }
+        public static ReplyKeyboardMarkup UserListKeyboard()
+        {
+            if (UserListKeyboardMarkup is  null)
+            {
+                UserListKeyboardMarkup = new(new[]
+                {
+                    new KeyboardButton[] { "نمایش کاربران \U0001f9d1", "جستجو 🔎" },
+                    // new KeyboardButton[] { "", "فعال کردن کاربر ✔️" },
+                    new KeyboardButton[] { "بازگشت به مرحله قبل"  },
+                    new KeyboardButton[] { "صفحه اصلی"  },
+
+                }) { ResizeKeyboard = true };
+            }
+
+            return UserListKeyboardMarkup;
+        }
         public static ReplyKeyboardMarkup SetMainKeyboardMarkup()
         {
             if (mainKeyboardMarkup == null)
@@ -38,7 +85,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 {
                     new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام 📧" },
                     new KeyboardButton[]{ "توقف فروش 🛑", "در دست تعمیر 🛠️" },
-                    new KeyboardButton[]{"بازگشت به صفحه اصلی"}
+                    new KeyboardButton[]{"صفحه اصلی"}
 
                 }) { ResizeKeyboard = true };
             }

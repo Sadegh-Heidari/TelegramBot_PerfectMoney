@@ -15,7 +15,7 @@ namespace TelegramBot_PerfectMoney
 {
     public static class Bootstrap
     {
-        // private static string connectionString = "Server=localhost; User ID=root; Password=126543210mM$; Database=TelBot";
+        private static string connectionString = "Server=localhost; User ID=root; Password=126543210mM$; Database=TelBot";
 
         public static   void AddTelegramConfig(this IHostBuilder host)
         {
@@ -23,7 +23,7 @@ namespace TelegramBot_PerfectMoney
             {
                 services.AddSingleton<TelegramBot>();
                 services.AddScoped<IOperationTelegramBot, OperationTelegramBot>();
-                // services.AddDbContext<TelContext>(x=>x.UseMySql(connectionString,ServerVersion.AutoDetect(connectionString)));
+                services.AddDbContext<TelContext>(x=>x.UseMySql(connectionString,ServerVersion.AutoDetect(connectionString)));
             });
         }
     }

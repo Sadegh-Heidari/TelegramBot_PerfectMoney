@@ -19,51 +19,9 @@ namespace TelegramBot_PerfectMoney.Migrations
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Telegram.Bot.Types.User", b =>
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<bool?>("AddedToAttachmentMenu")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool?>("CanJoinGroups")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool?>("CanReadAllGroupMessages")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("IsBot")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool?>("IsPremium")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("LanguageCode")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool?>("SupportsInlineQueries")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Username")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.User", b =>
-                {
-                    b.Property<long>("Id")
+                    b.Property<long>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
@@ -100,13 +58,12 @@ namespace TelegramBot_PerfectMoney.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("UserNameTelegram")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

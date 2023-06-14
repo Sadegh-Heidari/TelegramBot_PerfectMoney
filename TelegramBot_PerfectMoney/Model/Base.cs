@@ -8,7 +8,7 @@ namespace TelegramBot_PerfectMoney.Model
 {
     public class Base
     {
-        public long Id { get; set; }
+        public long id { get; set; }
         public DateTime CreationDate{ get; set; }
     }
 }

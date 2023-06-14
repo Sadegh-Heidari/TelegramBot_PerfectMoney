@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace TelegramBot_PerfectMoney.Model
 {
-    public class User:Base
+    public class userModel:Base
     {
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string UserNameTelegram { get; set; }
@@ -17,7 +18,7 @@ namespace TelegramBot_PerfectMoney.Model
         public long ChatId { get; set; }
         public bool Active { get; set; }
 
-        public User()
+        public userModel()
         {
             CreationDate = DateTime.Now;
             Active = true;

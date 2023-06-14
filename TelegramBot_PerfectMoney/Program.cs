@@ -21,8 +21,7 @@ var TokenPathFile = Path.Combine(AppContext.BaseDirectory, "TokenBot.txt");
 var Token = File.ReadAllText(TokenPathFile);
 Console.TreatControlCAsInput = true;
 var telegram = app.Services.GetService<TelegramBot>();
-try
-{
+
     await telegram.Run(Token);
     Console.WriteLine("\n------------------------------------------------------------\n");
     Console.WriteLine("For stop the prgoram press ESC");
@@ -37,19 +36,14 @@ try
         }
     }
 
-}
-catch (Exception e)
-{
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.Write("Error");
-    var ErrorMessage = e switch
-    {
-        ApiRequestException apiRequestException
-            => $":\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-        _ => e.InnerException.InnerException.Message
-    };
-    Console.ResetColor();
-    Console.WriteLine(ErrorMessage);
-    Console.WriteLine("\n\n Press any key for close program......");
-    Console.ReadKey();
-}
+
+// catch (Exception e)
+// {
+//     Console.ForegroundColor = ConsoleColor.Red;
+//     Console.Write("Error");
+//     var ErrorMessage = e.ToString();
+//     Console.ResetColor();
+//     Console.WriteLine(ErrorMessage);
+//     Console.WriteLine("\n\n Press any key for close program......");
+//     Console.ReadKey();
+// }

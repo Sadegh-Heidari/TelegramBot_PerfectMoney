@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
+using TelegramBot_PerfectMoney.Model;
 
 namespace TelegramBot_PerfectMoney.DataBase
 {
@@ -12,7 +13,7 @@ namespace TelegramBot_PerfectMoney.DataBase
     {
         private static string connectionString = "Server=localhost; User ID=root; Password=126543210mM$; Database=TelBot";
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<userModel> Users { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
