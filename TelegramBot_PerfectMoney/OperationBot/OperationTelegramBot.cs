@@ -189,15 +189,17 @@ namespace TelegramBot_PerfectMoney.OperationBot
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("لطفا شماره کاربر را با فرمت زیر وارد کنید.");
-            stringBuilder.AppendLine("شماره همراه : 09****");
-            await botClient.SendTextMessageAsync(update.Message.Chat.Id,stringBuilder.ToString() ,
+            stringBuilder.AppendLine("شماره همراه : ****09");
+            await botClient.SendTextMessageAsync(update.Message.Chat.Id,stringBuilder.ToString(),
                 cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BackKeyboards());
             UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.BackKeyboards());
         }
 
         public async Task SearchUserByPhoneNumber(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var checkPhone = ConvertHelper.IsIranianPhoneNumber(update.Message.Text);
+            var extractNumber = ConvertHelper.ExtractNumberFromText(update.Message.Text);
+            
+            var checkPhone = ConvertHelper.IsIranianPhoneNumber(extractNumber);
             if (!checkPhone)
             {
                await botClient.SendTextMessageAsync(update.Message.Chat.Id,
