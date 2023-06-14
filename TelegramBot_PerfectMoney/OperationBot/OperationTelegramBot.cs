@@ -187,12 +187,12 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task SendNumberRequest(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("لطفا شماره کاربر را با فرمت زیر وارد کنید.");
-            stringBuilder.AppendLine("شماره همراه : ****09");
-            await botClient.SendTextMessageAsync(update.Message.Chat.Id,stringBuilder.ToString(),
-                cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BackKeyboards());
-            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.BackKeyboards());
+            // var stringBuilder = new StringBuilder();
+            // stringBuilder.AppendLine("لطفا شماره کاربر را با فرمت زیر وارد کنید.");
+            // stringBuilder.AppendLine("شماره همراه : ****09");
+            // await botClient.SendTextMessageAsync(update.Message.Chat.Id,stringBuilder.ToString(),
+            //     cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BackKeyboards());
+            // UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.BackKeyboards());
         }
 
         public async Task SearchUserByPhoneNumber(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -255,6 +255,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
             {
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id, "این کاربر وجود ندارد",
                     cancellationToken: cancellationToken);
+
                 return;
             }
 
@@ -262,6 +263,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
             _context.SaveChanges();
             await botClient.SendTextMessageAsync(update.Message.Chat.Id, "کاربر با موفقیت فعال شد",
                 cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BlockUser());
+            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BlockUser());
 
         }
 
@@ -279,6 +281,26 @@ namespace TelegramBot_PerfectMoney.OperationBot
             _context.SaveChanges();
             await botClient.SendTextMessageAsync(update.Message.Chat.Id, "کاربر با مسدود شد",
                 cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.ActivUser());
+            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.ActivUser());
+
+        }
+
+        public async Task SendMessageToUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == SavePhonNumber);
+            if (user == null)
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "این کاربر وجود ندارد",
+                    cancellationToken: cancellationToken);
+                return;
+            }
+
+            var convert = new ChatId(user.ChatId);
+            
+           await botClient.SendTextMessageAsync(convert.Identifier, update.Message.Text,
+                cancellationToken: cancellationToken);
+           await botClient.SendTextMessageAsync(update.Message.Chat.Id, "پیام با موفقیت ارسال شد.",
+               replyMarkup: CreatKeyboard.BackKeyboards(), cancellationToken: cancellationToken);
         }
     }
 }

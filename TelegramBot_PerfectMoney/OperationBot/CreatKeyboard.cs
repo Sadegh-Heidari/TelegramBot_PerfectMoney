@@ -116,7 +116,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
             {
                 AdminMainKeyboradMarkup = new(new[]
                 {
-                    new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام 📧" },
+                    new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام همگانی 📧" },
                     new KeyboardButton[]{ "توقف فروش 🛑", "در دست تعمیر 🛠️" },
                     new KeyboardButton[]{"صفحه اصلی"}
 

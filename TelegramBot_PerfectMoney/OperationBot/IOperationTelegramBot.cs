@@ -17,9 +17,10 @@ namespace TelegramBot_PerfectMoney.OperationBot
         Task BackToMainSection(ITelegramBotClient  botClient, Update update, CancellationToken cancellationToken);
         Task BackToPreviousnStep(ITelegramBotClient  botClient, Update update, CancellationToken cancellationToken);
         Task GetUserList(ITelegramBotClient botClient, Update update , CancellationToken cancellationToken, string page);
-        Task SendNumberRequest(ITelegramBotClient botClient,Update  update, CancellationToken cancellationToken);
+        // Task SendNumberRequest(ITelegramBotClient botClient,Update  update, CancellationToken cancellationToken);
         Task SearchUserByPhoneNumber(ITelegramBotClient botClient,Update  update, CancellationToken cancellationToken);
         Task ActiveUser(ITelegramBotClient botClient, Update update , CancellationToken cancellationToken);
         Task BlockUser(ITelegramBotClient botClient, Update update , CancellationToken cancellationToken);
+        Task SendMessageToUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken);
     }
 }

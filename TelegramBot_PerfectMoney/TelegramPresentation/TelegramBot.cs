@@ -116,7 +116,25 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                     }
                     else if (update.Message?.Text == "جستجو 🔎")
                     {
-                        await _operation.SendNumberRequest(botClient, update, cancellationToken);
+                        var stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine("لطفا شماره کاربر را با فرمت زیر وارد کنید.");
+                        stringBuilder.AppendLine("شماره همراه : ****09");
+                        await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
+                            cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
+                        UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                    }
+                    else if(update.Message?.Text == "ارسال پیام به کاربر 📧")
+                    {
+                        var stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine("لطفا پیام خودرا با فرمت زیر وارد کنید.");
+                        stringBuilder.AppendLine("پیام :");
+                        await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
+                            cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
+                        UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                    }
+                    else if (update.Message.Text.Contains("پیام :"))
+                    {
+                       await _operation.SendMessageToUser(botClient,update,cancellationToken);
                     }
                     else if (update.Message.Text.Contains("شماره همراه"))
                     {
