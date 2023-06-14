@@ -187,8 +187,10 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task SendNumberRequest(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-
-           await botClient.SendTextMessageAsync(update.Message.Chat.Id, "لطفا شماره کاربر را ارسال کنید",
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("لطفا شماره کاربر را با فرمت زیر وارد کنید.");
+            stringBuilder.AppendLine("شماره همراه : 09****");
+            await botClient.SendTextMessageAsync(update.Message.Chat.Id,stringBuilder.ToString() ,
                 cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BackKeyboards());
             UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.BackKeyboards());
         }

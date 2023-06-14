@@ -110,7 +110,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                 {
                     await _operation.SendNumberRequest(botClient, update, cancellationToken);
                 }
-                else if (update.Message.Text.Contains("09")||update.Message.Text.Contains("+98"))
+                else if (update.Message.Text.Contains("شماره همراه"))
                 {
                    await _operation.SearchUserByPhoneNumber(botClient, update, cancellationToken);
                 }
@@ -127,7 +127,11 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                 {
                     await _operation.BackToMainSection(botClient, update, cancellationToken);
                 }
-
+                else
+                {
+                 await   botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                        cancellationToken: cancellationToken);
+                }
             }
 
 
