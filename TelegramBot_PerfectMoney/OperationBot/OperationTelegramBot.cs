@@ -208,7 +208,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
             }
          
          
-            var result = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == update.Message.Text);
+            var result = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == extractNumber);
             if (result is null)
             {
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id,
