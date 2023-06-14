@@ -15,6 +15,8 @@ namespace TelegramBot_PerfectMoney.OperationBot
         private static ReplyKeyboardMarkup? UserListKeyboardMarkup { get; set; }
         private static InlineKeyboardMarkup? PaginitionListMarkup { get; set; }
         private static ReplyKeyboardMarkup? BackKeyboardsMarkup { get; set; }
+        private static ReplyKeyboardMarkup? ActiveKeyboardMarkup { get; set; }
+        private static ReplyKeyboardMarkup? BlockKeyboardMarkup { get; set; }
 
         public static ReplyKeyboardMarkup BackKeyboards()
         {
@@ -77,6 +79,37 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         }
 
+        public static ReplyKeyboardMarkup ActivUser()
+        {
+            if (ActiveKeyboardMarkup is null)
+            {
+                ActiveKeyboardMarkup = new ReplyKeyboardMarkup(new[]
+                    {
+                        new KeyboardButton[] { "فعال کردن کاربر ✔️" },
+                        new KeyboardButton[] { "ارسال پیام به کاربر 📧", "لیست سفارشات کاربر 📄" },
+                        new KeyboardButton[] { "مدیریت " + "👨🏼‍💼", "صفحه اصلی" }
+
+                    })
+                    { ResizeKeyboard = true };
+            }
+            return ActiveKeyboardMarkup;
+        }
+
+        public static ReplyKeyboardMarkup BlockUser()
+        {
+            if (BlockKeyboardMarkup == null)
+            {
+               BlockKeyboardMarkup = new ReplyKeyboardMarkup(new[]
+                    {
+                        new KeyboardButton[] { "مسدود کردن کاربر 🚧" },
+                        new KeyboardButton[] { "ارسال پیام به کاربر 📧", "لیست سفارشات کاربر 📄" },
+                        new KeyboardButton[] { "مدیریت "+ "👨🏼‍💼", "صفحه اصلی" }
+                    })
+                    { ResizeKeyboard = true };
+            }
+
+            return BlockKeyboardMarkup;
+        }
         public static ReplyKeyboardMarkup SetAdminMainKeyboard()
         {
             if (AdminMainKeyboradMarkup is null)

@@ -231,12 +231,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
             SavePhonNumber = result.PhoneNumber;
             if (result.Active)
             {
-                var button = new ReplyKeyboardMarkup(new []
-                {
-                    new KeyboardButton[] { "مسدود کردن کاربر 🚧" },
-                    new KeyboardButton[] { "ارسال پیام به کاربر 📧", "لیست سفارشات کاربر 📄" },
-                    new KeyboardButton[] { "مدیریت "+ "👨🏼‍💼", "صفحه اصلی" }
-                }){ResizeKeyboard = true};
+                var button = CreatKeyboard.BlockUser();
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id, text.ToString(),
                     cancellationToken: cancellationToken, replyMarkup: button);
                 UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),button);
@@ -244,20 +239,46 @@ namespace TelegramBot_PerfectMoney.OperationBot
             }
             else
             {
-                var button = new ReplyKeyboardMarkup(new[]
-                    {
-                        new KeyboardButton[] { "فعال کردن کاربر ✔️" },
-                        new KeyboardButton[] { "ارسال پیام به کاربر 📧", "لیست سفارشات کاربر 📄" },
-                        new KeyboardButton[] { "مدیریت " + "👨🏼‍💼", "صفحه اصلی" }
-
-                    })
-                    { ResizeKeyboard = true };
+                var button = CreatKeyboard.ActivUser();
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id, text.ToString(),
                     cancellationToken: cancellationToken, replyMarkup: button);
                 UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),button);
                 return;
             }
            
+        }
+
+        public async Task ActiveUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == SavePhonNumber);
+            if (user == null)
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "این کاربر وجود ندارد",
+                    cancellationToken: cancellationToken);
+                return;
+            }
+
+            user.Active = true;
+            _context.SaveChanges();
+            await botClient.SendTextMessageAsync(update.Message.Chat.Id, "کاربر با موفقیت فعال شد",
+                cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BlockUser());
+
+        }
+
+        public async Task BlockUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == SavePhonNumber);
+            if (user == null)
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "این کاربر وجود ندارد",
+                    cancellationToken: cancellationToken);
+                return;
+            }
+
+            user.Active = false;
+            _context.SaveChanges();
+            await botClient.SendTextMessageAsync(update.Message.Chat.Id, "کاربر با مسدود شد",
+                cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.ActivUser());
         }
     }
 }

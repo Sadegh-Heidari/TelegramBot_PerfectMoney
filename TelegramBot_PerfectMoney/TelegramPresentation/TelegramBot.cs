@@ -122,6 +122,14 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                     {
                         await _operation.SearchUserByPhoneNumber(botClient, update, cancellationToken);
                     }
+                    else if(update.Message.Text == "مسدود کردن کاربر 🚧")
+                    {
+                        await _operation.BlockUser(botClient, update, cancellationToken);
+                    }
+                    else if(update.Message.Text == "فعال کردن کاربر ✔️")
+                    {
+                       await _operation.ActiveUser(botClient, update, cancellationToken);
+                    }
                     #endregion
 
 
