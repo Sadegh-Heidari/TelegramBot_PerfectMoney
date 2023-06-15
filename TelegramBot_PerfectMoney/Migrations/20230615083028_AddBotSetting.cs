@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TelegramBot_PerfectMoney.Migrations
 {
-    public partial class AddBotSettingTable : Migration
+    public partial class AddBotSetting : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -22,6 +22,11 @@ namespace TelegramBot_PerfectMoney.Migrations
                     table.PrimaryKey("PK_botSettings", x => x.id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.InsertData(
+                table: "botSettings",
+                columns: new[] { "id", "StopSelling" },
+                values: new object[] { 1L, false });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

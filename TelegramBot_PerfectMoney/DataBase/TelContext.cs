@@ -24,10 +24,7 @@ namespace TelegramBot_PerfectMoney.DataBase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<BotSetting>().HasData(new List<BotSetting>()
-            {
-                new BotSetting() { StopSelling = false }
-            });
+          
             var assembly = typeof(UserMapping).Assembly;
             modelBuilder.ApplyConfigurationsFromAssembly(assembly);
             

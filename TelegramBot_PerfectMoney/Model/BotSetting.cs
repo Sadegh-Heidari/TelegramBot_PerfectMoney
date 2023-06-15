@@ -9,7 +9,6 @@ namespace TelegramBot_PerfectMoney.Model
 {
     public class BotSetting
     {
-        [Key]
         public long id { get; set; }
         public bool StopSelling { get; set; } = false;
         // public bool Repair { get; set; }

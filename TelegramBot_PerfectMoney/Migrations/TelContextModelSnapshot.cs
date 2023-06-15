@@ -31,6 +31,13 @@ namespace TelegramBot_PerfectMoney.Migrations
                     b.HasKey("id");
 
                     b.ToTable("botSettings");
+
+                    b.HasData(
+                        new
+                        {
+                            id = 1L,
+                            StopSelling = false
+                        });
                 });
 
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>

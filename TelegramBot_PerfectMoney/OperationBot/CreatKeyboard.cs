@@ -39,7 +39,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 AdminStopSellingMainMarkup = new(new[]
                     {
                         new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام همگانی 📧" },
-                        new KeyboardButton[]{ "شروع فروش ✔️", "در دست تعمیر 🛠️" },
+                        new KeyboardButton[]{ "توقف فروش 🛑", "در دست تعمیر 🛠️" },
                         new KeyboardButton[]{"صفحه اصلی"}
 
                     })
@@ -134,7 +134,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 AdminActiveSellingMainMarkup = new(new[]
                 {
                     new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام همگانی 📧" },
-                    new KeyboardButton[]{ "توقف فروش 🛑", "در دست تعمیر 🛠️" },
+                    new KeyboardButton[]{ "شروع فروش ✔️", "در دست تعمیر 🛠️" },
                     new KeyboardButton[]{"صفحه اصلی"}
 
                 }) { ResizeKeyboard = true };

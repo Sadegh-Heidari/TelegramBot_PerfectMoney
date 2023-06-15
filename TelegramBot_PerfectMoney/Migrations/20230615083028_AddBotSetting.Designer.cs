@@ -11,8 +11,8 @@ using TelegramBot_PerfectMoney.DataBase;
 namespace TelegramBot_PerfectMoney.Migrations
 {
     [DbContext(typeof(TelContext))]
-    [Migration("20230615073002_AddBotSettingTable")]
-    partial class AddBotSettingTable
+    [Migration("20230615083028_AddBotSetting")]
+    partial class AddBotSetting
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,6 +33,13 @@ namespace TelegramBot_PerfectMoney.Migrations
                     b.HasKey("id");
 
                     b.ToTable("botSettings");
+
+                    b.HasData(
+                        new
+                        {
+                            id = 1L,
+                            StopSelling = false
+                        });
                 });
 
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>

@@ -100,9 +100,14 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                     #region About Admin Panel
 
 
-                    if (update.Message?.Text == "لیست کاربران 📄" && typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard())
+                    if (update.Message?.Text == "لیست کاربران 📄" )
                     {
-                        await _operation.AdminUserListSection(botClient, update, cancellationToken);
+                        if (typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard() ||
+                            typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard())
+                        {
+                            await _operation.AdminUserListSection(botClient, update, cancellationToken);
+
+                        }
                     }
                     else if (update.Message?.Text == "مدیریت " + "👨🏼‍💼" )
                     {
@@ -115,14 +120,19 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                             PageNumber = 1;
                         await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
                     }
-                    else if (update.Message.Text == "ارسال پیام همگانی 📧" && typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard())
+                    else if (update.Message.Text == "ارسال پیام همگانی 📧" )
                     {
-                        var stringBuilder = new StringBuilder();
-                        stringBuilder.AppendLine("لطفا پیام خودرا با فرمت زیر وارد کنید.");
-                        stringBuilder.AppendLine("پیام به تمامی اعضا :");
-                        await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
-                            cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
-                        UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                        if (typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard() ||
+                            typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard())
+                        {
+                            var stringBuilder = new StringBuilder();
+                            stringBuilder.AppendLine("لطفا پیام خودرا با فرمت زیر وارد کنید.");
+                            stringBuilder.AppendLine("پیام به تمامی اعضا :");
+                            await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
+                                cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
+                            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                        }
+                      
                     }
                     else if(update.Message.Text.Contains("پیام") && typkeyborad==CreatKeyboard.BackKeyboards())
                     {
@@ -149,6 +159,14 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         }
                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
                             cancellationToken: cancellationToken);
+                    }
+                    else if(update.Message.Text == "در دست تعمیر 🛠️")
+                    {
+                        if (typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard() ||
+                            typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard())
+                        {
+                            await _operation.StopBot(botClient, update, cancellationToken);
+                        }
                     }
                     else if (update.Message?.Text == "جستجو 🔎" && typkeyborad == CreatKeyboard.UserListKeyboard())
                     {
@@ -220,6 +238,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                          await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
                              cancellationToken: cancellationToken);
                      }
+
                 }
                
                 

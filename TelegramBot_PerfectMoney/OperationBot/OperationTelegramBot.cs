@@ -357,5 +357,16 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 replyMarkup: Adminkeyboard,
                 cancellationToken: cancellationToken);
         }
+
+        public async Task StopBot(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var chatId = await _context.Users.Where(x=>x.ChatId != update.Message.Chat.Id).Select(x => x.ChatId).ToListAsync();
+            foreach (var item in chatId)
+            {
+               await botClient.SendTextMessageAsync(item, "ربات در دست تعمیر", cancellationToken: cancellationToken);
+            }
+            await botClient.DeleteWebhookAsync(false,cancellationToken: cancellationToken);
+           await botClient.CloseAsync(cancellationToken);
+        }
     }
 }
