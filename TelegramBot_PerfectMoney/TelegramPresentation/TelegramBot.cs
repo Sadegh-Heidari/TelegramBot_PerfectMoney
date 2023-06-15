@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -11,7 +14,9 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBot_PerfectMoney.DataBase;
 using TelegramBot_PerfectMoney.Helper;
+using TelegramBot_PerfectMoney.Model;
 using TelegramBot_PerfectMoney.OperationBot;
 
 namespace TelegramBot_PerfectMoney.TelegramPresentation
@@ -19,13 +24,14 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
     public class TelegramBot
     {
         private UserStepHandler stepHandler { get; set; }
-
         private int PageNumber { get; set; }
         private IOperationTelegramBot _operation { get; set; }
         private CancellationTokenSource cts { get; }
-        public TelegramBot(IOperationTelegramBot operation)
+        private TelContext _context { get; set; }
+        public TelegramBot(IOperationTelegramBot operation, TelContext context)
         {
             _operation = operation;
+            _context = context;
             cts = new();
             stepHandler = new();
         }
@@ -59,8 +65,8 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
         }
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            
-
+           
+         
             if (update?.Message is not null || update.CallbackQuery is not null)
             {
                 if (update.Message?.Text == "/start")
@@ -71,7 +77,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                     //      
                     // }
                     await _operation.Start(botClient, update, cancellationToken);
-                    UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
+                    // UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
 
 
                 }
@@ -97,6 +103,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                else if (update.Type == UpdateType.Message)
                 {
                     var typkeyborad = UserStepHandler.GetUserLastStep(update.Message.Chat.Id.ToString());
+                    
                     #region About Admin Panel
 
 
@@ -240,7 +247,11 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                      }
 
                 }
-               
+                else
+                {
+                    await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                        cancellationToken: cancellationToken);
+                }
                 
 
 

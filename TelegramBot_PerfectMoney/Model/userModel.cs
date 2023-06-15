@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace TelegramBot_PerfectMoney.Model
 {
@@ -17,7 +19,8 @@ namespace TelegramBot_PerfectMoney.Model
         public int MessageId { get; set; }
         public long ChatId { get; set; }
         public bool Active { get; set; }
-
+        public long RoleId { get; set; }
+        public RoleModel Roles { get; set; }
         public userModel()
         {
             CreationDate = DateTime.Now;

@@ -9,7 +9,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
 {
     internal static class CreatKeyboard
     {
-        private static ReplyKeyboardMarkup? mainKeyboardMarkup { get; set; }
+        private static ReplyKeyboardMarkup? mainKeyboardMarkupForAdmin { get; set; }
         private static ReplyKeyboardMarkup? AdminActiveSellingMainMarkup { get; set; }
         private static ReplyKeyboardMarkup? ShareContactKeyboradMarkup { get; set; }
         private static ReplyKeyboardMarkup? UserListKeyboardMarkup { get; set; }
@@ -18,6 +18,20 @@ namespace TelegramBot_PerfectMoney.OperationBot
         private static ReplyKeyboardMarkup? ActiveKeyboardMarkup { get; set; }
         private static ReplyKeyboardMarkup? BlockKeyboardMarkup { get; set; }
         private static ReplyKeyboardMarkup? AdminStopSellingMainMarkup { get; set; }
+        private static ReplyKeyboardMarkup? MainKeyboardMarkUpForUser { get; set; }
+        public static ReplyKeyboardMarkup SetMainKeyboardMarkupForUser()
+        {
+            if (MainKeyboardMarkUpForUser is null)
+            {
+                MainKeyboardMarkUpForUser = new ReplyKeyboardMarkup(new []
+                {
+                    new KeyboardButton[] { "خرید 💸", "موجودی 💳"},
+                    new KeyboardButton[] { "احراز هویت 🔒", "قوانین ⚖️" },
+                }){ResizeKeyboard = true};
+            }
+
+            return MainKeyboardMarkUpForUser;
+        }
         public static ReplyKeyboardMarkup BackKeyboards()
         {
             if (BackKeyboardsMarkup is null)
@@ -78,11 +92,11 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
             return UserListKeyboardMarkup;
         }
-        public static ReplyKeyboardMarkup SetMainKeyboardMarkup()
+        public static ReplyKeyboardMarkup SetMainKeyboardMarkupForAdmin()
         {
-            if (mainKeyboardMarkup == null)
+            if (mainKeyboardMarkupForAdmin == null)
             {
-                mainKeyboardMarkup = new(new[]
+                mainKeyboardMarkupForAdmin = new(new[]
                 {
                     new KeyboardButton[] { "خرید 💸", "موجودی 💳"},
                     new KeyboardButton[] { "احراز هویت 🔒", "قوانین ⚖️" },
@@ -92,7 +106,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                     ResizeKeyboard = true
                 };
             }
-            return mainKeyboardMarkup;
+            return mainKeyboardMarkupForAdmin;
 
         }
 

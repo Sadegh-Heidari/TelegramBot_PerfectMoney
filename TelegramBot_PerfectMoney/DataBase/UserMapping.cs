@@ -23,6 +23,7 @@ namespace TelegramBot_PerfectMoney.DataBase
             builder.Property(x => x.CreationDate);
             builder.Property(x => x.PhoneNumber).HasMaxLength(200);
             builder.Property(x => x.UserNameTelegram).IsRequired(false).HasMaxLength(200);
+            builder.HasOne(x => x.Roles).WithMany(x => x.Users).HasForeignKey(x => x.RoleId);
         }
     }
 }
