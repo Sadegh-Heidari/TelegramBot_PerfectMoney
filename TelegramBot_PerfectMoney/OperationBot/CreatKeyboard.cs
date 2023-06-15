@@ -10,14 +10,14 @@ namespace TelegramBot_PerfectMoney.OperationBot
     internal static class CreatKeyboard
     {
         private static ReplyKeyboardMarkup? mainKeyboardMarkup { get; set; }
-        private static ReplyKeyboardMarkup? AdminMainKeyboradMarkup { get; set; }
+        private static ReplyKeyboardMarkup? AdminActiveSellingMainMarkup { get; set; }
         private static ReplyKeyboardMarkup? ShareContactKeyboradMarkup { get; set; }
         private static ReplyKeyboardMarkup? UserListKeyboardMarkup { get; set; }
         private static InlineKeyboardMarkup? PaginitionListMarkup { get; set; }
         private static ReplyKeyboardMarkup? BackKeyboardsMarkup { get; set; }
         private static ReplyKeyboardMarkup? ActiveKeyboardMarkup { get; set; }
         private static ReplyKeyboardMarkup? BlockKeyboardMarkup { get; set; }
-
+        private static ReplyKeyboardMarkup? AdminStopSellingMainMarkup { get; set; }
         public static ReplyKeyboardMarkup BackKeyboards()
         {
             if (BackKeyboardsMarkup is null)
@@ -30,6 +30,23 @@ namespace TelegramBot_PerfectMoney.OperationBot
                     { ResizeKeyboard = true };
             }
             return BackKeyboardsMarkup;
+        }
+
+        public static ReplyKeyboardMarkup SetAdminStopSellingKeyboard()
+        {
+            if (AdminStopSellingMainMarkup is null)
+            {
+                AdminStopSellingMainMarkup = new(new[]
+                    {
+                        new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام همگانی 📧" },
+                        new KeyboardButton[]{ "شروع فروش ✔️", "در دست تعمیر 🛠️" },
+                        new KeyboardButton[]{"صفحه اصلی"}
+
+                    })
+                    { ResizeKeyboard = true };
+            }
+
+            return AdminStopSellingMainMarkup;
         }
         public static InlineKeyboardMarkup PaginitionUserListKeyboard()
         {
@@ -110,11 +127,11 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
             return BlockKeyboardMarkup;
         }
-        public static ReplyKeyboardMarkup SetAdminMainKeyboard()
+        public static ReplyKeyboardMarkup SetAdminActiveSellingMainKeyboard()
         {
-            if (AdminMainKeyboradMarkup is null)
+            if (AdminActiveSellingMainMarkup is null)
             {
-                AdminMainKeyboradMarkup = new(new[]
+                AdminActiveSellingMainMarkup = new(new[]
                 {
                     new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام همگانی 📧" },
                     new KeyboardButton[]{ "توقف فروش 🛑", "در دست تعمیر 🛠️" },
@@ -123,7 +140,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 }) { ResizeKeyboard = true };
             }
 
-            return AdminMainKeyboradMarkup;
+            return AdminActiveSellingMainMarkup;
         }
 
         public static ReplyKeyboardMarkup GetContactKeyboard()

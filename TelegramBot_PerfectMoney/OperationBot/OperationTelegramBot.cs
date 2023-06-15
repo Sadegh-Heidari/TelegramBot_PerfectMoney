@@ -54,13 +54,28 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task AdminMainSection(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var Adminkeyboard = CreatKeyboard.SetAdminMainKeyboard();
-            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),Adminkeyboard);
-            Message sentMessage = await botClient.SendTextMessageAsync(
-                chatId: update.Message!.Chat.Id,
-                text: "پنل مدیریت",
-                replyMarkup: Adminkeyboard,
-                cancellationToken: cancellationToken);
+            var CheckSelling =  _context.botSettings.Select(x => x.StopSelling).FirstOrDefault();
+            if (CheckSelling == false)
+            {
+                var Adminkeyboard = CreatKeyboard.SetAdminStopSellingKeyboard();
+                UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), Adminkeyboard);
+                Message sentMessage = await botClient.SendTextMessageAsync(
+                    chatId: update.Message!.Chat.Id,
+                    text: "پنل مدیریت",
+                    replyMarkup: Adminkeyboard,
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                var Adminkeyboard = CreatKeyboard.SetAdminActiveSellingMainKeyboard();
+                UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), Adminkeyboard);
+                Message sentMessage = await botClient.SendTextMessageAsync(
+                    chatId: update.Message!.Chat.Id,
+                    text: "پنل مدیریت",
+                    replyMarkup: Adminkeyboard,
+                    cancellationToken: cancellationToken);
+            }
+           
         }
 
         public async Task GetContact(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -301,6 +316,46 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 cancellationToken: cancellationToken);
            await botClient.SendTextMessageAsync(update.Message.Chat.Id, "پیام با موفقیت ارسال شد.",
                replyMarkup: CreatKeyboard.BackKeyboards(), cancellationToken: cancellationToken);
+        }
+
+        public async Task SendMessageToAllUsers(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var users = await _context.Users.Select(x => x.ChatId).ToListAsync();
+            foreach (var item in users)
+            {
+                if (item != update.Message.Chat.Id)
+                {
+                   await botClient.SendTextMessageAsync(item, update.Message.Text, cancellationToken: cancellationToken);
+                }
+            }
+        }
+
+        public async Task ActivSelling(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var stopSelling = await _context.botSettings.FirstOrDefaultAsync();
+            stopSelling.StopSelling = false;
+            _context.SaveChanges();
+            var Adminkeyboard = CreatKeyboard.SetAdminStopSellingKeyboard();
+            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), Adminkeyboard);
+            Message sentMessage = await botClient.SendTextMessageAsync(
+                chatId: update.Message!.Chat.Id,
+                text: "فروش شروغ شد",
+                replyMarkup: Adminkeyboard,
+                cancellationToken: cancellationToken);
+        }
+
+        public async Task StopSelling(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var stopSelling = await _context.botSettings.FirstOrDefaultAsync();
+            stopSelling.StopSelling = true;
+            _context.SaveChanges();
+            var Adminkeyboard = CreatKeyboard.SetAdminActiveSellingMainKeyboard();
+            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), Adminkeyboard);
+            Message sentMessage = await botClient.SendTextMessageAsync(
+                chatId: update.Message!.Chat.Id,
+                text: "فروش متوقف شد",
+                replyMarkup: Adminkeyboard,
+                cancellationToken: cancellationToken);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace TelegramBot_PerfectMoney.DataBase
         private static string connectionString = "Server=localhost; User ID=root; Password=126543210mM$; Database=TelBot";
 
         public DbSet<userModel> Users { get; set; }
-
+        public DbSet<BotSetting> botSettings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -24,6 +24,10 @@ namespace TelegramBot_PerfectMoney.DataBase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<BotSetting>().HasData(new List<BotSetting>()
+            {
+                new BotSetting() { StopSelling = false }
+            });
             var assembly = typeof(UserMapping).Assembly;
             modelBuilder.ApplyConfigurationsFromAssembly(assembly);
             

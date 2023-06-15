@@ -96,25 +96,61 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
 
                else if (update.Type == UpdateType.Message)
                 {
+                    var typkeyborad = UserStepHandler.GetUserLastStep(update.Message.Chat.Id.ToString());
                     #region About Admin Panel
 
 
-                    if (update.Message?.Text == "لیست کاربران 📄")
+                    if (update.Message?.Text == "لیست کاربران 📄" && typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard())
                     {
                         await _operation.AdminUserListSection(botClient, update, cancellationToken);
                     }
-                    else if (update.Message?.Text == "مدیریت " + "👨🏼‍💼")
+                    else if (update.Message?.Text == "مدیریت " + "👨🏼‍💼" )
                     {
                         await _operation.AdminMainSection(botClient, update, cancellationToken);
 
                     }
-                    else if (update.Message?.Text == "نمایش کاربران 🧑")
+                    else if (update.Message?.Text == "نمایش کاربران 🧑" && typkeyborad == CreatKeyboard.UserListKeyboard())
                     {
                         if (PageNumber > 1 || PageNumber == 0)
                             PageNumber = 1;
                         await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
                     }
-                    else if (update.Message?.Text == "جستجو 🔎")
+                    else if (update.Message.Text == "ارسال پیام همگانی 📧" && typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard())
+                    {
+                        var stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine("لطفا پیام خودرا با فرمت زیر وارد کنید.");
+                        stringBuilder.AppendLine("پیام به تمامی اعضا :");
+                        await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
+                            cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
+                        UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                    }
+                    else if(update.Message.Text.Contains("پیام") && typkeyborad==CreatKeyboard.BackKeyboards())
+                    {
+                       await _operation.SendMessageToAllUsers(botClient, update, cancellationToken);
+                    }
+                    else if (update.Message.Text == "شروع فروش ✔️")
+                    {
+                        if (typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard() ||
+                            typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard())
+                        {
+                           await _operation.ActivSelling(botClient, update, cancellationToken);
+                            return;
+                        }
+                        await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                            cancellationToken: cancellationToken);
+                    }
+                    else if (update.Message.Text == "توقف فروش \U0001f6d1")
+                    {
+                        if (typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard() ||
+                            typkeyborad == CreatKeyboard.SetAdminActiveSellingMainKeyboard())
+                        {
+                           await _operation.StopSelling(botClient, update, cancellationToken);
+                            return;
+                        }
+                        await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                            cancellationToken: cancellationToken);
+                    }
+                    else if (update.Message?.Text == "جستجو 🔎" && typkeyborad == CreatKeyboard.UserListKeyboard())
                     {
                         var stringBuilder = new StringBuilder();
                         stringBuilder.AppendLine("لطفا شماره کاربر را با فرمت زیر وارد کنید.");
@@ -123,31 +159,51 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                             cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
                         UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
                     }
-                    else if(update.Message?.Text == "ارسال پیام به کاربر 📧")
+                    else if(update.Message?.Text == "ارسال پیام به کاربر 📧" )
                     {
-                        var stringBuilder = new StringBuilder();
-                        stringBuilder.AppendLine("لطفا پیام خودرا با فرمت زیر وارد کنید.");
-                        stringBuilder.AppendLine("پیام :");
-                        await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
-                            cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
-                        UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                        if (typkeyborad == CreatKeyboard.BlockUser() || typkeyborad == CreatKeyboard.ActivUser())
+                        {
+                            var stringBuilder = new StringBuilder();
+                            stringBuilder.AppendLine("لطفا پیام خودرا با فرمت زیر وارد کنید.");
+                            stringBuilder.AppendLine("پیام از طرف مدیر بات :");
+                            await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
+                                cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
+                            UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                            
+                            return;
+                        }
+                        await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                            cancellationToken: cancellationToken);
                     }
-                    else if (update.Message.Text.Contains("پیام :"))
+                    else if (update.Message.Text.Contains("پیام از طرف مدیر بات") && typkeyborad == CreatKeyboard.BackKeyboards())
                     {
                        await _operation.SendMessageToUser(botClient,update,cancellationToken);
                     }
-                    else if (update.Message.Text.Contains("شماره همراه"))
+                    else if (update.Message.Text.Contains("شماره همراه")&& typkeyborad == CreatKeyboard.BackKeyboards())
                     {
                         await _operation.SearchUserByPhoneNumber(botClient, update, cancellationToken);
                     }
-                    else if(update.Message.Text == "مسدود کردن کاربر 🚧")
+                    else if(update.Message.Text == "مسدود کردن کاربر 🚧" )
                     {
-                        await _operation.BlockUser(botClient, update, cancellationToken);
+                        if (typkeyborad == CreatKeyboard.BlockUser() || typkeyborad == CreatKeyboard.ActivUser())
+                        {
+                            await _operation.BlockUser(botClient, update, cancellationToken);
+                            return;
+                        }
+                        await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                            cancellationToken: cancellationToken);
                     }
                     else if(update.Message.Text == "فعال کردن کاربر ✔️")
                     {
-                       await _operation.ActiveUser(botClient, update, cancellationToken);
+                        if (typkeyborad == CreatKeyboard.BlockUser() || typkeyborad == CreatKeyboard.ActivUser())
+                        {
+                            await _operation.ActiveUser(botClient, update, cancellationToken);
+                            return;
+                        }
+                        await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                            cancellationToken: cancellationToken);
                     }
+                   
                     #endregion
 
 
