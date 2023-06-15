@@ -30,10 +30,26 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public  async Task Start(ITelegramBotClient botClient,Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == null)
             {
+                var ShareContactKeyboard = CreatKeyboard.GetContactKeyboard();
+                Message sentMessage = await botClient.SendTextMessageAsync(
+                    chatId: update.Message!.Chat.Id,
+                    text: "لطفا شماره تلفن خود را ارسال کنید",
+                    replyMarkup: ShareContactKeyboard,
+                    cancellationToken: cancellationToken);
+                return;
+            }
+           else if (role.Roles.Role == "Admin")
+            {
+                if (role.ChatId == null)
+                {
+                    role.ChatId = update.Message.Chat.Id.ToString();
+                    _context.Update(role);
+                    _context.SaveChanges();
+                }
                 var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForAdmin();
                 UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
                 Message sentMessage = await botClient.SendTextMessageAsync(
@@ -41,6 +57,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                     text: "به بات خرید پرفکت مانی خوش آمدید.",
                     replyMarkup: mainKeyboardMarkup,
                     cancellationToken: cancellationToken);
+                return;
             }
             else
             {
@@ -71,9 +88,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
         public async Task AdminMainSection(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
 
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role is not  null&&role?.Roles?.Role == "Admin")
             {
                 var CheckSelling = _context.botSettings.Select(x => x.StopSelling).FirstOrDefault();
                 if (CheckSelling == false)
@@ -119,9 +136,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task AdminUserListSection(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var AdminUser = CreatKeyboard.UserListKeyboard();
                 UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), AdminUser);
@@ -141,9 +158,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task BackToMainSection(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
                 var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForAdmin();
@@ -191,14 +208,14 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task GetUserList(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken,string page)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var key = CreatKeyboard.PaginitionUserListKeyboard();
+                var AllCount = _context.Users.Count();
 
-
-                var result = await _context.Users.Skip((Convert.ToInt32(page) - 1) * 10).Take(10).ToListAsync();
+                var result = await _context.Users.Where(x=>x.RoleId !=1).Include(x=>x.Roles).Skip((Convert.ToInt32(page) - 1) * 10).Take(10).ToListAsync();
                 if (result.Count == 0)
                 {
                     await botClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "اطلاعات وجود ندارد", cancellationToken: cancellationToken);
@@ -224,7 +241,14 @@ namespace TelegramBot_PerfectMoney.OperationBot
                     text.AppendLine();
                 }
 
-                if (result.Count < 10)
+                if (result.Count < 10 && AllCount < 10)
+                {
+                    await botClient.SendTextMessageAsync(update.Message.Chat.Id, text.ToString(), cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BackKeyboards());
+                    UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+
+                    return;
+                }
+                if (result.Count < 10 )
                 {
                     await botClient.EditMessageTextAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.MessageId, text.ToString(), cancellationToken: cancellationToken);
                     await botClient.EditMessageReplyMarkupAsync(update.CallbackQuery.Message.Chat.Id,
@@ -280,9 +304,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task SearchUserByPhoneNumber(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var extractNumber = ConvertHelper.ExtractNumberFromText(update.Message.Text);
 
@@ -343,9 +367,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task ActiveUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == SavePhonNumber);
                 if (user == null)
@@ -361,6 +385,11 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id, "کاربر با موفقیت فعال شد",
                     cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BlockUser());
                 UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BlockUser());
+                var chatid = new ChatId(user.ChatId);
+                
+               
+                await botClient.SendTextMessageAsync(chatid, "تبریک! کاربر محترم مسدودیت شما برطرف شد.",
+                    cancellationToken: cancellationToken);
                 return;
             }
             else
@@ -373,9 +402,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task BlockUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == SavePhonNumber);
                 if (user == null)
@@ -387,10 +416,15 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
                 user.Active = false;
                 _context.SaveChanges();
-                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "کاربر با مسدود شد",
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "کاربر مسدود شد",
                     cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.ActivUser());
                 UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.ActivUser());
+                var chatid = new ChatId(user.ChatId);
 
+                
+                await botClient.SendTextMessageAsync(Convert.ToInt64(user.ChatId),
+                    "کاربر محترم شما مسدود شدید. لطفا به ادمین پیام دهید",cancellationToken:cancellationToken);
+              
             }
             else
             {
@@ -401,9 +435,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task SendMessageToUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == SavePhonNumber);
                 if (user == null)
@@ -430,14 +464,14 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task SendMessageToAllUsers(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var users = await _context.Users.Select(x => x.ChatId).ToListAsync();
                 foreach (var item in users)
                 {
-                    if (item != update.Message.Chat.Id)
+                    if (item != update.Message.Chat.Id.ToString())
                     {
                         await botClient.SendTextMessageAsync(item, update.Message.Text, cancellationToken: cancellationToken);
                     }
@@ -452,9 +486,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task ActivSelling(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var stopSelling = await _context.botSettings.FirstOrDefaultAsync();
                 stopSelling.StopSelling = false;
@@ -463,9 +497,15 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), Adminkeyboard);
                 Message sentMessage = await botClient.SendTextMessageAsync(
                     chatId: update.Message!.Chat.Id,
-                    text: "فروش شروغ شد",
+                    text: "فروش شروع شد",
                     replyMarkup: Adminkeyboard,
                     cancellationToken: cancellationToken);
+                var AllUser = await _context.Users.Where(x => x.RoleId != 1).Include(x => x.Roles).Select(x=>x.ChatId).ToListAsync();
+                foreach (var item in AllUser)
+                {
+                    await botClient.SendTextMessageAsync(Convert.ToInt64(item),
+                        "پیام به تمامی اعضای محترم: فروش شروع شد.", cancellationToken: cancellationToken);
+                }
             }
             else
             {
@@ -476,9 +516,9 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task StopSelling(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
                 var stopSelling = await _context.botSettings.FirstOrDefaultAsync();
                 stopSelling.StopSelling = true;
@@ -490,6 +530,12 @@ namespace TelegramBot_PerfectMoney.OperationBot
                     text: "فروش متوقف شد",
                     replyMarkup: Adminkeyboard,
                     cancellationToken: cancellationToken);
+                var AllUser = await _context.Users.Where(x => x.RoleId != 1).Include(x => x.Roles).Select(x => x.ChatId).ToListAsync();
+                foreach (var item in AllUser)
+                {
+                    await botClient.SendTextMessageAsync(Convert.ToInt64(item),
+                        "پیام به تمامی اعضای محترم: فروش متوقف شد.", cancellationToken: cancellationToken);
+                }
             }
             else
             {
@@ -501,11 +547,11 @@ namespace TelegramBot_PerfectMoney.OperationBot
 
         public async Task StopBot(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id).Include(x => x.Roles)
+            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
                 .FirstOrDefaultAsync();
-            if (role.Roles.Role == "Admin")
+            if (role == "Admin")
             {
-                var chatId = await _context.Users.Where(x => x.ChatId != update.Message.Chat.Id).Select(x => x.ChatId).ToListAsync();
+                var chatId = await _context.Users.Where(x => x.ChatId != update.Message.Chat.Id.ToString()).Select(x => x.ChatId).ToListAsync();
                 foreach (var item in chatId)
                 {
                     await botClient.SendTextMessageAsync(item, "ربات در دست تعمیر", cancellationToken: cancellationToken);
@@ -517,6 +563,50 @@ namespace TelegramBot_PerfectMoney.OperationBot
             {
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id, "دسترسی شما به این قسمت مجاز نیس.",
                     cancellationToken: cancellationToken);
+            }
+        }
+
+        public async Task SaveContact(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var user = await _context.Users.Where(x => x.PhoneNumber == update.Message.Contact.PhoneNumber)
+                .Include(x => x.Roles).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                var NewUser = new userModel()
+                {
+                    ChatId = update.Message.Chat.Id.ToString(),
+                    CodeId = null,
+                    FirstName = update.Message.Contact.FirstName,
+                    LastName = update.Message.Contact.LastName,
+                    PhoneNumber = update.Message.Contact.PhoneNumber,
+                    UserNameTelegram = update.Message.Chat.Username,
+                    RoleId = 2
+
+                };
+                _context.Users.Add(NewUser);
+                _context.SaveChanges();
+               await botClient.SendTextMessageAsync(update.Message.Chat.Id,
+                    "شماره تلفن شما ثبت شد لطفا برای تکمیل اطلاعات به پنل احراز هویت مراحعه فرمایید.",
+                    cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.SetMainKeyboardMarkupForUser());
+            }
+
+           else if (user.Roles.Role == "Admin")
+            {
+                user.FirstName = user.FirstName ?? update.Message.Contact.FirstName;
+                user.LastName = user.LastName ?? update.Message.Contact.LastName;
+                user.ChatId = user.ChatId ?? update.Message.Chat.Id.ToString();
+                _context.Update(user);
+                _context.SaveChanges();
+               await botClient.SendTextMessageAsync(update.Message.Chat.Id, "خوش آمدید",
+                    cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.SetMainKeyboardMarkupForAdmin());
+
+               // UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.SetMainKeyboardMarkupForAdmin());
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, $"به بات پرفکت مانی خوش آمدید.",
+                    cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.SetMainKeyboardMarkupForAdmin());
+                // UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.SetMainKeyboardMarkupForAdmin());
             }
         }
     }

@@ -11,8 +11,8 @@ using TelegramBot_PerfectMoney.DataBase;
 namespace TelegramBot_PerfectMoney.Migrations
 {
     [DbContext(typeof(TelContext))]
-    [Migration("20230615120555_addRoleTAble")]
-    partial class addRoleTAble
+    [Migration("20230615142654_initialz")]
+    partial class initialz
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -63,13 +63,13 @@ namespace TelegramBot_PerfectMoney.Migrations
                         new
                         {
                             id = 1L,
-                            CreationDate = new DateTime(2023, 6, 15, 16, 35, 55, 218, DateTimeKind.Local).AddTicks(6820),
+                            CreationDate = new DateTime(2023, 6, 15, 18, 56, 53, 840, DateTimeKind.Local).AddTicks(1982),
                             Role = "Admin"
                         },
                         new
                         {
                             id = 2L,
-                            CreationDate = new DateTime(2023, 6, 15, 16, 35, 55, 218, DateTimeKind.Local).AddTicks(6852),
+                            CreationDate = new DateTime(2023, 6, 15, 18, 56, 53, 840, DateTimeKind.Local).AddTicks(2014),
                             Role = "Customer"
                         });
                 });
@@ -83,11 +83,10 @@ namespace TelegramBot_PerfectMoney.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<long>("ChatId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("ChatId")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("CodeId")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
@@ -95,20 +94,14 @@ namespace TelegramBot_PerfectMoney.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<int>("MessageId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
@@ -124,6 +117,16 @@ namespace TelegramBot_PerfectMoney.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            id = 1L,
+                            Active = true,
+                            CreationDate = new DateTime(2023, 6, 15, 18, 56, 53, 840, DateTimeKind.Local).AddTicks(3083),
+                            PhoneNumber = "+989394059810",
+                            RoleId = 1L
+                        });
                 });
 
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>

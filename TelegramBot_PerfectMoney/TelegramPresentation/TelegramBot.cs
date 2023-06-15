@@ -57,17 +57,28 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($" @{me.Username}");
             Console.ResetColor();
-
-
+            // var users = await _context.Users.Where(x => x.RoleId != 1).Include(x => x.Roles).ToListAsync();
+            // foreach (var item in users)
+            // {
+            //     var convert = Convert.ToInt64(item.ChatId);
+            //    await botClient.SendTextMessageAsync(convert, "بات فعال شد");
+            // }
 
 
             // Send cancellation request to stop bot
         }
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-           
+            var ActiveUserCheck = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString())
+                .Include(x => x.Roles).Select(x => x.Active).FirstOrDefaultAsync();
+            if (!ActiveUserCheck)
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id,
+                    "کاربر محترم شما مسدود شدید. لطفا به ادمین پیام دهید", cancellationToken: cancellationToken);
+                return;
+            }
          
-            if (update?.Message is not null || update.CallbackQuery is not null)
+           else if (update?.Message is not null || update.CallbackQuery is not null)
             {
                 if (update.Message?.Text == "/start")
                 {
@@ -78,8 +89,13 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                     // }
                     await _operation.Start(botClient, update, cancellationToken);
                     // UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
+                    return;
 
-
+                }
+                else  if (update.Type == UpdateType.Message && update.Message.Contact is not null)
+                {
+                    await _operation.SaveContact(botClient, update, cancellationToken);
+                    return;
                 }
                 else if(update.Type == UpdateType.CallbackQuery)
                 {
@@ -96,7 +112,9 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                             PageNumber = 1;
 
                         await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
+                        return;
                     }
+                     return;
                 }
                 
 
@@ -113,12 +131,14 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                             typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard())
                         {
                             await _operation.AdminUserListSection(botClient, update, cancellationToken);
-
+                            return;
                         }
+                        return;
                     }
                     else if (update.Message?.Text == "مدیریت " + "👨🏼‍💼" )
                     {
                         await _operation.AdminMainSection(botClient, update, cancellationToken);
+                        return;
 
                     }
                     else if (update.Message?.Text == "نمایش کاربران 🧑" && typkeyborad == CreatKeyboard.UserListKeyboard())
@@ -126,6 +146,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         if (PageNumber > 1 || PageNumber == 0)
                             PageNumber = 1;
                         await _operation.GetUserList(botClient, update, cancellationToken, PageNumber.ToString());
+                        return;
                     }
                     else if (update.Message.Text == "ارسال پیام همگانی 📧" )
                     {
@@ -134,16 +155,18 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         {
                             var stringBuilder = new StringBuilder();
                             stringBuilder.AppendLine("لطفا پیام خودرا با فرمت زیر وارد کنید.");
-                            stringBuilder.AppendLine("پیام به تمامی اعضا :");
+                            stringBuilder.AppendLine("پیام به تمامی اعضای محترم :");
                             await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
                                 cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
                             UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                            return;
                         }
-                      
+                      return;
                     }
                     else if(update.Message.Text.Contains("پیام") && typkeyborad==CreatKeyboard.BackKeyboards())
                     {
                        await _operation.SendMessageToAllUsers(botClient, update, cancellationToken);
+                       return;
                     }
                     else if (update.Message.Text == "شروع فروش ✔️")
                     {
@@ -155,6 +178,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         }
                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
                             cancellationToken: cancellationToken);
+                        return;
                     }
                     else if (update.Message.Text == "توقف فروش \U0001f6d1")
                     {
@@ -166,6 +190,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         }
                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
                             cancellationToken: cancellationToken);
+                        return;
                     }
                     else if(update.Message.Text == "در دست تعمیر 🛠️")
                     {
@@ -173,16 +198,20 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                             typkeyborad == CreatKeyboard.SetAdminStopSellingKeyboard())
                         {
                             await _operation.StopBot(botClient, update, cancellationToken);
+                            cts.Cancel();
+                            return;
                         }
+                        return;
                     }
                     else if (update.Message?.Text == "جستجو 🔎" && typkeyborad == CreatKeyboard.UserListKeyboard())
                     {
                         var stringBuilder = new StringBuilder();
                         stringBuilder.AppendLine("لطفا شماره کاربر را با فرمت زیر وارد کنید.");
-                        stringBuilder.AppendLine("شماره همراه : ****09");
+                        stringBuilder.AppendLine("شماره همراه : +989");
                         await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
                             cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
                         UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
+                        return;
                     }
                     else if(update.Message?.Text == "ارسال پیام به کاربر 📧" )
                     {
@@ -199,14 +228,17 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         }
                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
                             cancellationToken: cancellationToken);
+                        return;
                     }
                     else if (update.Message.Text.Contains("پیام از طرف مدیر بات") && typkeyborad == CreatKeyboard.BackKeyboards())
                     {
                        await _operation.SendMessageToUser(botClient,update,cancellationToken);
+                       return;
                     }
                     else if (update.Message.Text.Contains("شماره همراه")&& typkeyborad == CreatKeyboard.BackKeyboards())
                     {
                         await _operation.SearchUserByPhoneNumber(botClient, update, cancellationToken);
+                        return;
                     }
                     else if(update.Message.Text == "مسدود کردن کاربر 🚧" )
                     {
@@ -217,6 +249,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         }
                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
                             cancellationToken: cancellationToken);
+                        return;
                     }
                     else if(update.Message.Text == "فعال کردن کاربر ✔️")
                     {
@@ -227,6 +260,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                         }
                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
                             cancellationToken: cancellationToken);
+                        return;
                     }
                    
                     #endregion
@@ -235,21 +269,23 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                     else if (update.Message?.Text == "بازگشت به مرحله قبل")
                      {
                          await _operation.BackToPreviousnStep(botClient, update, cancellationToken);
+                         return;
                      }
                      else if (update.Message?.Text == "صفحه اصلی")
                      {
                          await _operation.BackToMainSection(botClient, update, cancellationToken);
+                         return;
                      }
                      else
                      {
-                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                         await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "لطفا وارد صفحه اصلی شوید",
                              cancellationToken: cancellationToken);
                      }
 
                 }
                 else
                 {
-                    await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "عملیات نا معتبر",
+                    await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, "لطفا وارد صفحه اصلی شوید",
                         cancellationToken: cancellationToken);
                 }
                 

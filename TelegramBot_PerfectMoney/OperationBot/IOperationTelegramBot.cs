@@ -26,5 +26,6 @@ namespace TelegramBot_PerfectMoney.OperationBot
         Task ActivSelling(ITelegramBotClient botClient,Update update , CancellationToken cancellationToken);
         Task StopSelling(ITelegramBotClient botClient,Update update , CancellationToken cancellationToken);
         Task StopBot(ITelegramBotClient botClient,Update update ,CancellationToken cancellationToken);
+        Task SaveContact(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken);
     }
 }
