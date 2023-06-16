@@ -54,7 +54,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                     {
                         new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام همگانی 📧" },
                         new KeyboardButton[]{ "توقف فروش 🛑", "در دست تعمیر 🛠️" },
-                        new KeyboardButton[]{"صفحه اصلی"}
+                        new KeyboardButton[]{"صفحه اصلی", "تنظیم قوانین ⚖" }
 
                     })
                     { ResizeKeyboard = true };
@@ -149,7 +149,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 {
                     new KeyboardButton[]{ "لیست کاربران 📄", "ارسال پیام همگانی 📧" },
                     new KeyboardButton[]{ "شروع فروش ✔️", "در دست تعمیر 🛠️" },
-                    new KeyboardButton[]{"صفحه اصلی"}
+                    new KeyboardButton[]{"صفحه اصلی", "تنظیم قوانین ⚖" }
 
                 }) { ResizeKeyboard = true };
             }

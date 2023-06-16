@@ -16,9 +16,10 @@ namespace TelegramBot_PerfectMoney.DataBase
         {
             builder.HasKey(x => x.id);
             builder.Property(x => x.StopSelling);
+            builder.Property(x => x.RuleText).IsRequired(false);
             builder.HasData(new List<BotSetting>()
             {
-            new BotSetting() { id = 1,StopSelling = false }
+            new BotSetting() { id = 1,StopSelling = false ,RuleText = "متنی وجود ندارد"}
             });
         }
     }
